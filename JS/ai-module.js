@@ -1,7 +1,7 @@
 // MÓDULO DE IA - GEMINI INTEGRATION (AJUSTADO)
 const AI = {
-    // ⚠️ ATENCIÓN: Solo llama directamente si estás en un BACKEND SEGURO.
-    apiKey: 'TU_API_KEY_AQUI', // <--- Solo si es un entorno seguro (Backend)
+    // ⚠️ ATENCIÓN: Solo llama directamente si estás en un BACKEND SEGURO. ....api gratis por si me la intentas usarrr kkk
+    apiKey: 'AIzaSyCYpydIwRu0Fbwc5ApZ-msTcM2pZWxumlo', // <--- Solo si es un entorno seguro (Backend)
     baseUrl: 'https://generativelanguage.googleapis.com', 
     
     // ... init function ...
