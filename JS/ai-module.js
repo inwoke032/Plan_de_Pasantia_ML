@@ -26,9 +26,15 @@ const AI = {
 
     // Función genérica y corregida para llamar a Gemini
     async generateContent(prompt, systemInstruction = null) {
-        // ✅ CORRECCIÓN CLAVE: Inyectamos la clave directamente en la URL como parámetro de consulta
-        const fullUrl = `${this.baseUrl}/v1beta/models/${this.modelName}:generateContent?key=${this.apiKey}`;
+        // ✅ CORRECCIÓN CLAVE: Construye la URL base del endpoint
+        let fullUrl = `${this.baseUrl}/v1beta/models/${this.modelName}:generateContent`;
 
+        // Solo agrega la clave si está presente. Si es "", la omite, y el entorno
+        // de Canvas se encarga de inyectar la clave y manejar CORS.
+        if (this.apiKey) {
+            fullUrl += `?key=${this.apiKey}`;
+        }
+        
         // Si la clave no está configurada, salta un error (o usa un mecanismo de entorno)
         if (!this.apiKey && typeof window.__initial_auth_token === 'undefined') {
             console.error("No se encontró la clave de API.");
@@ -40,7 +46,6 @@ const AI = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // ❌ Eliminamos el header 'x-api-key' porque la pusimos en la URL
                 },
                 body: JSON.stringify({
                     // ✅ Estructura correcta del cuerpo para la API de Gemini
