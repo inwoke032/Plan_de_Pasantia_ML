@@ -7,7 +7,7 @@
 
 const AI = {
     // 🔑 Configuración de la API Key: Reemplaza 'TU_API_KEY_DE_GEMINI_AQUI'
-    apiKey: 'AIzaSyCcW8wdyLaCZgm1tBR8G_8jtwbBewbV_0o',
+    apiKey: 'AIzaSyAOe-QlEpmUuFFJkweKu-GX4CCk9f1bg64',
     // 🔗 URL Base de la API de Google (NO debe cambiarse)
     baseUrl: 'https://generativelanguage.googleapis.com',
     // 🤖 Modelo a usar (puedes cambiarlo según tu necesidad)
