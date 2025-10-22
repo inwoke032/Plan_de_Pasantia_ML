@@ -12,7 +12,7 @@ const AI = {
     // 🔗 URL Base de la API de Google (SOLO la raíz)
     baseUrl: 'https://generativelanguage.googleapis.com', 
     // 🤖 Modelo a usar (versión reciente recomendada)
-    modelName: 'gemini-2.5-flash-preview-09-2025', 
+    modelName: 'gemini-2.5-flash-preview-05-20', 
 
     // Inicializar
     async init() {
