@@ -48,14 +48,14 @@ const AI = {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    // ✅ Estructura correcta del cuerpo para la API de Gemini
+                    // ✅ CORRECCIÓN DE PAYLOAD: Eliminamos el campo 'config' que causaba el error 400.
+                    // 'systemInstruction' ahora es un campo de nivel superior con la estructura correcta.
                     contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    config: {
-                        // systemInstruction se pasa dentro de 'config' como un objeto
-                        ...(systemInstruction && { 
-                            systemInstruction: { text: systemInstruction } 
-                        }),
-                    }
+                    ...(systemInstruction && { 
+                        systemInstruction: { 
+                            parts: [{ text: systemInstruction }] 
+                        } 
+                    })
                 })
             });
 
