@@ -7,11 +7,11 @@
 
 const AI = {
     // 🔑 Configuración de la API Key: Reemplaza 'TU_API_KEY_DE_GEMINI_AQUI'
-    apiKey: 'AIzaSyCYpydIwRu0Fbwc5ApZ-msTcM2pZWxumlo',
+    apiKey: 'AIzaSyCcW8wdyLaCZgm1tBR8G_8jtwbBewbV_0o',
     // 🔗 URL Base de la API de Google (NO debe cambiarse)
-    baseUrl: 'https://generativelanguage.googleapis.com',
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models/{modelName}:generateContent',
     // 🤖 Modelo a usar (puedes cambiarlo según tu necesidad)
-    modelName: 'gemini-2.5-flash', 
+    modelName: 'gemini-2.5-flash-preview-05-20', 
 
     // Inicializar
     async init() {
