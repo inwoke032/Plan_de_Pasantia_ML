@@ -42,21 +42,25 @@ const AI = {
         }
 
         try {
+            // Construimos el cuerpo de la petición de forma limpia
+            const bodyPayload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+            };
+            
+            // ✅ NUEVA CORRECCIÓN: Usar 'generationConfig' para 'systemInstruction'.
+            // Esta es la estructura más robusta para el endpoint REST.
+            if (systemInstruction) {
+                bodyPayload.generationConfig = {
+                    systemInstruction: systemInstruction
+                };
+            }
+
             const response = await fetch(fullUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    // ✅ CORRECCIÓN DE PAYLOAD: Eliminamos el campo 'config' que causaba el error 400.
-                    // 'systemInstruction' ahora es un campo de nivel superior con la estructura correcta.
-                    contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    ...(systemInstruction && { 
-                        systemInstruction: { 
-                            parts: [{ text: systemInstruction }] 
-                        } 
-                    })
-                })
+                body: JSON.stringify(bodyPayload) // Usamos el payload construido
             });
 
             if (!response.ok) {
@@ -65,7 +69,8 @@ const AI = {
                 try {
                     // Intenta parsear el JSON de error para obtener el mensaje detallado
                     const errorJson = JSON.parse(errorText);
-                    errorMessage = errorJson.error?.message || response.statusText;
+                    // Esto capturará el mensaje como "Invalid JSON payload received."
+                    errorMessage = errorJson.error?.message || response.statusText; 
                 } catch (e) {
                     // Si no es JSON, usa el texto crudo
                     errorMessage = errorText;
