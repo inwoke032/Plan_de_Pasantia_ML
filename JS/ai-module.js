@@ -4,12 +4,12 @@
  */
 
 const AI = {
-    apiKey: 'configured',
-    baseUrl: '/api/gemini',
+    apiKey: 'AIzaSyCYpydIwRu0Fbwc5ApZ-msTcM2pZWxumlo',
+    baseUrl: 'https://generativelanguage.googleapis.com',
     
     // Inicializar
     async init() {
-        this.apiKey = 'configured';
+        this.apiKey = 'AIzaSyCYpydIwRu0Fbwc5ApZ-msTcM2pZWxumlo';
         console.log('✅ Módulo de IA inicializado (proxy seguro)');
         return true;
     },
