@@ -2,39 +2,45 @@
  * MÓDULO DE IA - GEMINI INTEGRATION
  * Funciones para interactuar con la API de Gemini (Estructura corregida)
  * * ⚠️ ADVERTENCIA: La apiKey NO debe estar visible en el código de frontend.
- * Este código asume un entorno seguro (Node.js/Backend) o un proxy.
+ * Se recomienda usar un proxy de backend para proteger la clave.
  */
 
 const AI = {
-    // 🔑 Configuración de la API Key: Reemplaza 'TU_API_KEY_DE_GEMINI_AQUI'
-    apiKey: 'AIzaSyAOe-QlEpmUuFFJkweKu-GX4CCk9f1bg64',
-    // 🔗 URL Base de la API de Google (NO debe cambiarse)
-    baseUrl: 'https://generativelanguage.googleapis.com',
-    // 🤖 Modelo a usar (puedes cambiarlo según tu necesidad)
-    modelName: 'gemini-2.5-flash-preview-05-20', 
+    // 🔑 Configuración de la API Key: Reemplaza "" por tu clave
+    // Utiliza una clave de ejemplo para el entorno de Canvas
+    apiKey: "AIzaSyAOe-QlEpmUuFFJkweKu-GX4CCk9f1bg64", 
+    // 🔗 URL Base de la API de Google (SOLO la raíz)
+    baseUrl: 'https://generativelanguage.googleapis.com', 
+    // 🤖 Modelo a usar (versión reciente recomendada)
+    modelName: 'gemini-2.5-flash-preview-09-2025', 
 
     // Inicializar
     async init() {
-        if (this.apiKey === 'TU_API_KEY_DE_GEMINI_AQUI') {
-            console.error('❌ ERROR: Por favor, configura tu API Key de Gemini.');
-            return false;
+        if (this.apiKey === '') {
+            console.warn('⚠️ ADVERTENCIA: El módulo de IA se inicializó sin una clave de API configurada. Las llamadas directas fallarán si la clave no está disponible globalmente.');
+        } else {
+            console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
         }
-        console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
         return true;
     },
 
     // Función genérica y corregida para llamar a Gemini
     async generateContent(prompt, systemInstruction = null) {
-        // Construye la URL completa con el modelo y el endpoint
-        const fullUrl = `${this.baseUrl}/v1/models/${this.modelName}:generateContent`;
+        // ✅ CORRECCIÓN CLAVE: Inyectamos la clave directamente en la URL como parámetro de consulta
+        const fullUrl = `${this.baseUrl}/v1beta/models/${this.modelName}:generateContent?key=${this.apiKey}`;
+
+        // Si la clave no está configurada, salta un error (o usa un mecanismo de entorno)
+        if (!this.apiKey && typeof window.__initial_auth_token === 'undefined') {
+            console.error("No se encontró la clave de API.");
+            throw new Error('Error de autenticación. Verifica tu API key de Gemini.');
+        }
 
         try {
             const response = await fetch(fullUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Incluye la clave API directamente en un encabezado para la autenticación
-                    'x-api-key': this.apiKey, 
+                    // ❌ Eliminamos el header 'x-api-key' porque la pusimos en la URL
                 },
                 body: JSON.stringify({
                     // ✅ Estructura correcta del cuerpo para la API de Gemini
@@ -49,17 +55,25 @@ const AI = {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                // Muestra un error más detallado de la API
-                throw new Error(error.error.message || 'Error desconocido en la API de Gemini');
+                const errorText = await response.text();
+                let errorMessage = response.statusText;
+                try {
+                    // Intenta parsear el JSON de error para obtener el mensaje detallado
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.error?.message || response.statusText;
+                } catch (e) {
+                    // Si no es JSON, usa el texto crudo
+                    errorMessage = errorText;
+                }
+                // Muestra el código de estado para ayudar a la depuración (403, 401, 400)
+                throw new Error(`[Status ${response.status}] ${errorMessage}`);
             }
 
             const data = await response.json();
 
             // ✅ Extracción del texto de la respuesta corregida
             if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-                // Maneja casos donde la respuesta está bloqueada o vacía
-                 if (data.promptFeedback && data.promptFeedback.blockReason) {
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
                     throw new Error(`Respuesta bloqueada. Motivo: ${data.promptFeedback.blockReason}`);
                 }
                 throw new Error('Respuesta inválida o vacía de Gemini');
@@ -128,34 +142,122 @@ Responde únicamente con el JSON, sin texto adicional.`;
         }
     },
     
-    // ... Puedes copiar el resto de las funciones (analyzeProductivity, enhanceNote, etc.)
-    //     y simplemente llamar a 'this.generateContent(prompt, systemInstruction)' 
-    //     dentro de ellas, sin necesidad de cambios adicionales.
-    
-    // Ejemplo de otra función con el ajuste:
+    // Analizar productividad y dar insights
     async analyzeProductivity(data) {
         const prompt = `Analiza estos datos de productividad y proporciona 3 insights clave:
         
 Datos:
 - Tareas completadas esta semana: ${data.completedTasks}
-// ... más datos
-        
+- Tareas pendientes: ${data.pendingTasks}
+- Sesiones Pomodoro: ${data.pomodoroSessions}
+- Racha de hábitos: ${data.habitStreak} días
+- Horas de estudio estimadas: ${data.studyHours}
+
+Proporciona:
+1. Un análisis breve del rendimiento
+2. Una recomendación específica para mejorar
+3. Un mensaje motivacional personalizado
+
 Formato: Texto claro y conciso, máximo 150 palabras.`;
         
         return await this.generateContent(prompt);
     },
     
-    // ... resto de las funciones ...
+    // Mejorar/completar notas
+    async enhanceNote(noteContent, action = 'improve') {
+        let prompt = '';
+        
+        switch (action) {
+            case 'improve':
+                prompt = `Mejora esta nota manteniendo el contenido principal pero haciéndola más clara y estructurada:\n\n${noteContent}`;
+                break;
+            case 'summarize':
+                prompt = `Crea un resumen conciso de esta nota (máximo 100 palabras):\n\n${noteContent}`;
+                break;
+            case 'expand':
+                prompt = `Expande esta nota agregando detalles relevantes y ejemplos:\n\n${noteContent}`;
+                break;
+            case 'bullets':
+                prompt = `Convierte esta nota en puntos clave (bullets):\n\n${noteContent}`;
+                break;
+        }
+        
+        return await this.generateContent(prompt);
+    },
+    
+    // Sugerir hábitos basados en objetivos
+    async suggestHabits(goals, currentHabits = []) {
+        const prompt = `Sugiere 3 hábitos diarios para alguien que quiere: ${goals}
+
+Hábitos actuales: ${currentHabits.join(', ') || 'Ninguno'}
+
+Devuelve SOLO un array JSON:
+[
+    {
+        "name": "Nombre del hábito",
+        "description": "Por qué es importante",
+        "icon": "code|book|exercise|meditation|water|study"
+    }
+]
+
+Responde únicamente con el JSON, sin texto adicional.`;
+        
+        const response = await this.generateContent(prompt);
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            return JSON.parse(response.trim()); 
+        } catch (error) {
+            console.error('Error parseando hábitos sugeridos:', error);
+            console.log('Respuesta cruda que falló el parseo:', response); 
+            return [];
+        }
+    },
+    
+    // Crear plan de estudio personalizado
+    async createStudyPlan(topic, duration, level) {
+        const prompt = `Crea un plan de estudio estructurado para:
+Tema: ${topic}
+Duración: ${duration}
+Nivel: ${level}
+
+Proporciona un plan con fases, objetivos y recursos recomendados.
+Máximo 300 palabras, bien estructurado con bullets o números.`;
+        
+        return await this.generateContent(prompt);
+    },
+    
+    // Generar resumen diario/semanal
+    async generateSummary(periodData) {
+        const prompt = `Genera un resumen motivador de este período:
+
+Logros:
+- Tareas completadas: ${periodData.tasksCompleted}
+- Hábitos cumplidos: ${periodData.habitsCompleted}
+- Sesiones de enfoque: ${periodData.focusSessions}
+- Notas creadas: ${periodData.notesCreated}
+
+Proporciona:
+1. Resumen de logros (50 palabras)
+2. Estadística destacada
+3. Mensaje motivacional para la próxima semana
+
+Formato claro y positivo.`;
+        
+        return await this.generateContent(prompt);
+    },
+    
+    // Responder preguntas sobre recursos de IA/ML
+    async answerQuestion(question) {
+        const systemPrompt = `Eres un experto en Inteligencia Artificial y Machine Learning.
+Responde preguntas de forma clara, educativa y práctica.
+Si la pregunta no es sobre IA/ML, indica que estás especializado en esos temas.`;
+        
+        return await this.generateContent(question, systemPrompt);
+    }
 };
 
 // Exportar para uso global
 window.AI = AI;
-
-// Ejemplo de cómo usarlo:
-// AI.init().then(success => {
-//     if (success) {
-//         AI.chat("Hola, ¿cuáles son mis tareas para hoy?").then(response => {
-//             console.log("Respuesta de IA:", response);
-//         }).catch(console.error);
-//     }
-// });
