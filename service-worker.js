@@ -1,18 +1,18 @@
 const CACHE_NAME = 'pasantia-ia-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/auth.html',
-  '/CSS/style.css',
-  '/CSS/auth.css',
-  '/JS/script.js',
-  '/JS/auth.js',
-  '/JS/ai-module.js',
-  '/JS/ai-chat.js',
-  '/JS/app-init.js',
-  '/JS/supabase-client.js',
-  '/assets/images/logo.png',
-  '/manifest.json'
+  'index.html',
+  'auth.html',
+  'CSS/style.css',
+  'CSS/auth.css',
+  'JS/script.js',
+  'JS/auth.js',
+  'JS/ai-module.js',
+  'JS/ai-chat.js',
+  'JS/app-init.js',
+  'JS/supabase-client.js',
+  'assets/images/logo.png',
+  'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
