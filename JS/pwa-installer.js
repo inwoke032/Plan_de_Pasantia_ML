@@ -40,7 +40,54 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// FUNCIÓN PARA DETECTAR iOS
+function isIos() {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(userAgent);
+}
 
+// FUNCIÓN PARA DETECTAR MODO STANDALONE (APP INSTALADA)
+function isInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches;
+}
+
+
+window.addEventListener('load', () => {
+    if (isIos() && !isInstalled()) {
+        
+        // Crea un mensaje o un banner flotante solo para usuarios de iPhone
+        const iosInstallMessage = document.createElement('div');
+        iosInstallMessage.id = 'ios-install-hint';
+        iosInstallMessage.innerHTML = `
+            <p>
+                Para instalar esta App, pulsa el botón de **Compartir** (<img src="assets/images/share-icon-ios.png" alt="Icono de Compartir" style="height:1em; margin: 0 5px;">)
+                y selecciona **'Añadir a pantalla de inicio'**.
+            </p>
+        `;
+        // Asegúrate de darle estilos CSS (posición fija, color de fondo, etc.)
+        iosInstallMessage.style.cssText = `
+            position: fixed; 
+            bottom: 20px; 
+            width: 90%; 
+            padding: 15px; 
+            background: #4A90E2; 
+            color: white; 
+            text-align: center; 
+            border-radius: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        `;
+        document.body.appendChild(iosInstallMessage);
+        
+        // Ocultar este mensaje cuando la PWA se instale
+        window.addEventListener('appinstalled', () => {
+             iosInstallMessage.style.display = 'none';
+        });
+
+    } else if ('serviceWorker' in navigator) {
+        // ... (código existente para registrar SW y mostrar el botón de deferredPrompt en Android/PC) ...
+    }
 // 3. EVENTOS DE INSTALACIÓN (A2HS)
 
 // 3.1. Captura el evento beforeinstallprompt
