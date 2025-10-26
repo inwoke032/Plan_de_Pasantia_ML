@@ -1,3 +1,4 @@
+let deferredPrompt;
 // Crea y configura el botón de instalación
 const installButton = document.createElement('button');
 installButton.id = 'pwa-install-button';
