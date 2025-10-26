@@ -1,5 +1,3 @@
-
-
 // 1. REGISTRO Y GESTIÓN DEL SERVICE WORKER
 if ('serviceWorker' in navigator) {
     // Registra el Service Worker después de que la página haya cargado
