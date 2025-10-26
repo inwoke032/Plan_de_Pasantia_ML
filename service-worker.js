@@ -1,6 +1,5 @@
 const CACHE_NAME = 'pasantia-ia-v1';
 const urlsToCache = [
-  '/',
   'index.html',
   'auth.html',
   'CSS/style.css',
