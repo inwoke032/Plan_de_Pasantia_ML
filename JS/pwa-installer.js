@@ -1,9 +1,4 @@
-// pwa-installer.js
-
-// 1. DECLARACIÓN DE VARIABLES GLOBALES
 let deferredPrompt;
-const REPO_NAME = 'Plan_de_Pasantia_ML'; // <--- Define el nombre exacto del repositorio aquí
-
 // Crea y configura el botón de instalación
 const installButton = document.createElement('button');
 installButton.id = 'pwa-install-button';
