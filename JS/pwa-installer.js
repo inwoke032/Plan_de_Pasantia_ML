@@ -1,7 +1,4 @@
-/**
- * Lógica de inicialización del Service Worker (PWA)
- * y gestión del botón de "Instalar App".
- */
+
 
 // 1. REGISTRO Y GESTIÓN DEL SERVICE WORKER
 if ('serviceWorker' in navigator) {
