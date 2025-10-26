@@ -1,7 +1,3 @@
-// pwa-installer.js
-
-// 1. GESTIÓN DEL BOTÓN DE INSTALACIÓN (A2HS - Add to Home Screen)
-// Esta debe ser la ÚNICA DECLARACIÓN en todo tu proyecto
 let deferredPrompt;
 
 // Crea y configura el botón de instalación
