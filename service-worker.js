@@ -11,7 +11,7 @@ const urlsToCache = [
   'JS/ai-chat.js',
   'JS/app-init.js',
   'JS/supabase-client.js',
-  'assets/images/logo.png',
+  'assets/images/logo.png', // <-- ¡Asegúrate de que esta ruta existe!
   'manifest.json'
 ];
 
@@ -20,7 +20,30 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Cache abierto');
-        return cache.addAll(urlsToCache);
+        
+        // **********************************************
+        // * APLICAMOS EL FILTRO PARA EVITAR EL FALLO *
+        // **********************************************
+        return Promise.all(
+          urlsToCache.map(url => {
+            return fetch(url).then(response => {
+              // Verifica si el fetch fue exitoso (status 200)
+              if (!response.ok) {
+                console.warn(`⚠️ Omitiendo: ${url} (Error ${response.status})`);
+                return Promise.resolve(); // Resuelve el error sin fallar el Promise.all
+              }
+              return cache.put(url, response);
+            }).catch(error => {
+              // Captura errores de red (p. ej., problemas de conexión)
+              console.error(`❌ Falló al intentar cachear: ${url}`, error);
+              return Promise.resolve(); // Resuelve el error sin fallar el Promise.all
+            });
+          })
+        );
+      })
+      .then(() => {
+        // Log para saber que el proceso de caché (con fallos ignorados) terminó
+        console.log('✅ Instalación de caché completada (posibles omisiones).');
       })
   );
   self.skipWaiting();
