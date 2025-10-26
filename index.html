@@ -9,7 +9,15 @@
     <meta name="description" content="Aplicación interactiva completa para gestionar tu plan de pasantía en IA con sistema de tareas, notas, hábitos, calendario, análisis de productividad y mucho más.">
     <meta name="author" content="Joshua">
     <meta name="theme-color" content="#E8A87C">
-    
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Pasantía IA">
+    <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,6 +64,9 @@
                     </button>
                     <button class="btn-icon" id="settingsBtn" title="Configuración" data-testid="button-settings">
                         <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn-icon" id="logoutBtn" title="Cerrar Sesión" data-testid="button-logout">
+                        <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
             </div>
@@ -974,6 +985,61 @@
         </div>
     </div>
 
+    <!-- Modal for API Key Settings -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" data-testid="modal-settings">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Configuración</h3>
+                <button class="modal-close" data-testid="button-close-settings-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-key"></i> API Key de Gemini</h4>
+                    <p class="settings-description">Ingresa tu propia API key de Google Gemini para usar las funciones de IA.</p>
+
+                    <div class="form-group">
+                        <label for="geminiApiKey">API Key</label>
+                        <div class="api-key-input-group">
+                            <input type="password" id="geminiApiKey" placeholder="AIzaSy..." class="api-key-input">
+                            <button type="button" class="btn-icon-small" id="toggleApiKeyVisibility" title="Mostrar/Ocultar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small>
+                            <i class="fas fa-info-circle"></i>
+                            <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">
+                                Obtén tu API key gratuita aquí
+                            </a>
+                        </small>
+                    </div>
+
+                    <div class="api-key-status" id="apiKeyStatus">
+                        <i class="fas fa-circle"></i>
+                        <span>Sin configurar</span>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="saveApiKeyBtn">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+
+                    <button type="button" class="btn btn-outline" id="testApiKeyBtn" style="margin-top: 1rem;">
+                        <i class="fas fa-vial"></i> Probar Conexión
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <h4><i class="fas fa-user"></i> Información de Cuenta</h4>
+                    <div class="user-info">
+                        <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+                        <p><strong>Cuenta creada:</strong> <span id="userCreatedAt">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container" data-testid="div-toast-container"></div>
 
@@ -1108,9 +1174,24 @@
         </div>
     </div>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Client -->
+    <script src="JS/supabase-client.js"></script>
+
     <!-- AI Module -->
     <script src="JS/ai-module.js"></script>
-    
+
+    <!-- AI Chat -->
+    <script src="JS/ai-chat.js"></script>
+
+    <!-- App Initialization -->
+    <script src="JS/app-init.js"></script>
+
+    <!-- PWA Installer -->
+    <script src="JS/pwa-installer.js"></script>
+
     <!-- Main JavaScript -->
     <script src="JS/script.js"></script>
 </body>

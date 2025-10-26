@@ -6,40 +6,29 @@
  */
 
 const AI = {
-    // 🔑 Configuración de la API Key: Reemplaza "" por tu clave
-    // Utiliza una clave de ejemplo para el entorno de Canvas
-    apiKey: "AIzaSyAOe-QlEpmUuFFJkweKu-GX4CCk9f1bg64", 
-    // 🔗 URL Base de la API de Google (SOLO la raíz)
-    baseUrl: 'https://generativelanguage.googleapis.com', 
-    // 🤖 Modelo a usar (versión reciente recomendada)
-    modelName: 'gemini-2.5-flash-preview-05-20', 
+    baseUrl: 'https://generativelanguage.googleapis.com',
+    modelName: 'gemini-2.0-flash-exp',
 
-    // Inicializar
     async init() {
-        if (this.apiKey === '') {
-            console.warn('⚠️ ADVERTENCIA: El módulo de IA se inicializó sin una clave de API configurada. Las llamadas directas fallarán si la clave no está disponible globalmente.');
-        } else {
-            console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
-        }
+        console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
         return true;
     },
 
-    // Función genérica y corregida para llamar a Gemini
-    async generateContent(prompt, systemInstruction = null) {
-        // ✅ CORRECCIÓN CLAVE: Construye la URL base del endpoint
-        let fullUrl = `${this.baseUrl}/v1beta/models/${this.modelName}:generateContent`;
+    getApiKey() {
+        if (typeof getUserApiKey === 'function') {
+            return getUserApiKey();
+        }
+        return null;
+    },
 
-        // Solo agrega la clave si está presente. Si es "", la omite, y el entorno
-        // de Canvas se encarga de inyectar la clave y manejar CORS.
-        if (this.apiKey) {
-            fullUrl += `?key=${this.apiKey}`;
+    async generateContent(prompt, systemInstruction = null) {
+        const apiKey = this.getApiKey();
+
+        if (!apiKey) {
+            throw new Error('API Key no configurada. Por favor configura tu API Key de Gemini en Configuración.');
         }
-        
-        // Si la clave no está configurada, salta un error (o usa un mecanismo de entorno)
-        if (!this.apiKey && typeof window.__initial_auth_token === 'undefined') {
-            console.error("No se encontró la clave de API.");
-            throw new Error('Error de autenticación. Verifica tu API key de Gemini.');
-        }
+
+        let fullUrl = `${this.baseUrl}/v1beta/models/${this.modelName}:generateContent?key=${apiKey}`;
 
         try {
             // Construimos el cuerpo de la petición de forma limpia

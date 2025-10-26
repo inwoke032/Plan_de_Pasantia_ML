@@ -1636,6 +1636,11 @@ body {
         padding: 1rem;
     }
 
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
     .app-title {
         font-size: 1.25rem;
     }
@@ -1645,26 +1650,53 @@ body {
         height: 2.5rem;
     }
 
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
     .main-nav {
         padding: var(--spacing-xs);
+        gap: var(--spacing-xs);
     }
 
     .nav-tab {
         flex-direction: column;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
+        padding: 0.5rem;
+        font-size: 0.625rem;
+        min-width: auto;
+        gap: 0.25rem;
+    }
+
+    .nav-tab i {
+        font-size: 1rem;
     }
 
     .nav-tab span {
-        display: none;
+        font-size: 0.625rem;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.5rem;
     }
 
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    .widget {
+        margin-bottom: var(--spacing-md);
     }
 
     .tasks-board {
@@ -1680,7 +1712,12 @@ body {
     }
 
     .calendar-grid {
-        gap: var(--spacing-xs);
+        gap: 4px;
+    }
+
+    .calendar-day {
+        font-size: 0.75rem;
+        padding: 0.25rem;
     }
 
     .form-row {
@@ -1707,6 +1744,28 @@ body {
 
     .toast {
         min-width: auto;
+    }
+
+    .modal-content {
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+
+    .modal-header {
+        padding: 1rem;
+    }
+
+    .modal-body,
+    .modal-form {
+        padding: 1rem;
+    }
+
+    .widget-header {
+        padding: 1rem;
+    }
+
+    .widget-content {
+        padding: 1rem;
     }
 }
 
@@ -2371,9 +2430,139 @@ body.dark-mode {
     --accent: #818cf8;
 }
 
+/* ========== SETTINGS MODAL ========== */
+.settings-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-description {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.api-key-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.api-key-input {
+    flex: 1;
+}
+
+.api-key-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.api-key-status i {
+    font-size: 0.75rem;
+}
+
+.api-key-status.configured {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.api-key-status.configured i {
+    color: var(--success);
+}
+
+.api-key-status.not-configured {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.api-key-status.not-configured i {
+    color: var(--warning);
+}
+
+.user-info {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.user-info p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+}
+
+.user-info p:last-child {
+    margin-bottom: 0;
+}
+
+.user-info strong {
+    color: var(--text-primary);
+}
+
+/* ========== PWA INSTALL BUTTON ========== */
+.pwa-install-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 2rem;
+    background: linear-gradient(135deg, var(--success), #45a049);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-xl);
+    cursor: pointer;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 998;
+    transition: all var(--transition-base);
+    animation: pulse 2s infinite;
+}
+
+.pwa-install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+}
+
+.pwa-install-btn i {
+    font-size: 1.125rem;
+}
+
+@media (max-width: 768px) {
+    .pwa-install-btn {
+        bottom: 80px;
+        right: 1rem;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}
+
 /* ========== SMOOTH TRANSITIONS ========== */
 * {
-    transition: background-color var(--transition-base), 
+    transition: background-color var(--transition-base),
                 color var(--transition-base),
                 border-color var(--transition-base);
 }
