@@ -1,4 +1,5 @@
 let deferredPrompt;
+const REPO_NAME = 'Plan_de_Pasantia_ML';
 // Crea y configura el botón de instalación
 const installButton = document.createElement('button');
 installButton.id = 'pwa-install-button';
@@ -65,7 +66,7 @@ window.addEventListener('load', () => {
         // 2.1 REGISTRO Y GESTIÓN DEL SERVICE WORKER
         // CRÍTICO: Se utiliza el scope del repositorio para GitHub Pages
         navigator.serviceWorker.register('./service-worker.js', {
-             scope: `./`
+             scope: `/${REPO_NAME}/`
         })
             .then((registration) => {
                 console.log('Service Worker registrado exitosamente. Alcance:', registration.scope);
