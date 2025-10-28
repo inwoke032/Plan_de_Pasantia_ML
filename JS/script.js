@@ -1304,43 +1304,44 @@ function renderMonthView() {
     document.getElementById('calendarMonthView').style.display = 'block';
     document.getElementById('calendarWeekView').style.display = 'none';
     document.getElementById('calendarDayView').style.display = 'none';
-    
+
     const year = AppState.calendarDate.getFullYear();
     const month = AppState.calendarDate.getMonth();
-    
-    document.getElementById('calendarTitle').textContent = 
+
+    document.getElementById('calendarTitle').textContent =
         new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-    
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-    
+
     // Previous month days
-    for (let i = 0; i < firstDay; i++) {
-        grid.appendChild(document.createElement('div'));
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    for (let i = firstDay; i > 0; i--) {
+        grid.appendChild(createCalendarDay(daysInPrevMonth - i + 1, true));
     }
-    
+
     // Current month days with interactive calendar
     const today = new Date();
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(year, month, day);
         const dayEl = document.createElement('div');
-        
+
         if (currentDate >= START_DATE && currentDate <= END_DATE) {
             dayEl.className = 'calendar-day';
             dayEl.textContent = day;
             dayEl.dataset.date = currentDate.toISOString().split('T')[0];
-            
+
             // Check if it's today
             if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                 dayEl.classList.add('today');
             }
-            
+
             // Make clickable to show daily schedule
             dayEl.addEventListener('click', (e) => {
-                AppState.selectedDate = new Date(`${e.target.dataset.date}T00:00:00`);
+                AppState.selectedDate = new Date(`${e.currentTarget.dataset.date}T00:00:00`);
                 AppState.calendarDate = new Date(AppState.selectedDate);
                 document.querySelector('[data-calendar-view="day"]').click();
             });
@@ -1348,12 +1349,13 @@ function renderMonthView() {
             dayEl.className = 'calendar-day other-month';
             dayEl.textContent = day;
         }
-        
+
         grid.appendChild(dayEl);
     }
-    
+
     // Next month days
-    const remainingDays = 42 - (firstDay + daysInMonth);
+    const totalCells = firstDay + daysInMonth;
+    const remainingDays = 42 - totalCells;
     for (let day = 1; day <= remainingDays; day++) {
         const cell = createCalendarDay(day, true);
         grid.appendChild(cell);
@@ -1363,7 +1365,7 @@ function renderMonthView() {
 function createCalendarDay(day, isOtherMonth = false) {
     const cell = document.createElement('div');
     cell.className = `calendar-day ${isOtherMonth ? 'other-month' : ''}`;
-    cell.innerHTML = `<div class="day-number">${day}</div>`;
+    cell.textContent = day;
     return cell;
 }
 

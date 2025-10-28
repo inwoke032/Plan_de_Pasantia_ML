@@ -65,7 +65,7 @@ window.addEventListener('load', () => {
         // 2.1 REGISTRO Y GESTIÓN DEL SERVICE WORKER
         // CRÍTICO: Se utiliza el scope del repositorio para GitHub Pages
         navigator.serviceWorker.register('./service-worker.js', {
-             scope: `/${REPO_NAME}/` 
+             scope: `./`
         })
             .then((registration) => {
                 console.log('Service Worker registrado exitosamente. Alcance:', registration.scope);
