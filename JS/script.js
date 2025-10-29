@@ -1318,9 +1318,8 @@ function renderMonthView() {
     grid.innerHTML = '';
 
     // Previous month days
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-    for (let i = firstDay; i > 0; i--) {
-        grid.appendChild(createCalendarDay(daysInPrevMonth - i + 1, true));
+    for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
     }
 
     // Current month days with interactive calendar
@@ -1341,7 +1340,7 @@ function renderMonthView() {
 
             // Make clickable to show daily schedule
             dayEl.addEventListener('click', (e) => {
-                AppState.selectedDate = new Date(`${e.currentTarget.dataset.date}T00:00:00`);
+                AppState.selectedDate = new Date(`${e.target.dataset.date}T00:00:00`);
                 AppState.calendarDate = new Date(AppState.selectedDate);
                 document.querySelector('[data-calendar-view="day"]').click();
             });
@@ -1354,8 +1353,7 @@ function renderMonthView() {
     }
 
     // Next month days
-    const totalCells = firstDay + daysInMonth;
-    const remainingDays = 42 - totalCells;
+    const remainingDays = 42 - (firstDay + daysInMonth);
     for (let day = 1; day <= remainingDays; day++) {
         const cell = createCalendarDay(day, true);
         grid.appendChild(cell);
@@ -1365,7 +1363,7 @@ function renderMonthView() {
 function createCalendarDay(day, isOtherMonth = false) {
     const cell = document.createElement('div');
     cell.className = `calendar-day ${isOtherMonth ? 'other-month' : ''}`;
-    cell.textContent = day;
+    cell.innerHTML = `<div class="day-number">${day}</div>`;
     return cell;
 }
 
@@ -2046,10 +2044,6 @@ async function initAI() {
     const aiChatSend = document.getElementById('aiChatSend');
     const aiChatInput = document.getElementById('aiChatInputField');
     
-    aiChatToggle.addEventListener('click', () => {
-        aiChatPanel.classList.toggle('active');
-    });
-    
     aiChatClose.addEventListener('click', () => {
         aiChatPanel.classList.remove('active');
     });
@@ -2589,10 +2583,7 @@ function showLoading(show) {
 // ========================================
 
 function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    document.getElementById(modalId).classList.remove('active');
 }
 
 // Close modal on backdrop click

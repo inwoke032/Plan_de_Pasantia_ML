@@ -1,5 +1,4 @@
 let deferredPrompt;
-const REPO_NAME = 'Plan_de_Pasantia_ML';
 // Crea y configura el botón de instalación
 const installButton = document.createElement('button');
 installButton.id = 'pwa-install-button';
