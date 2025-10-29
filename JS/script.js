@@ -2589,7 +2589,10 @@ function showLoading(show) {
 // ========================================
 
 function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 // Close modal on backdrop click
