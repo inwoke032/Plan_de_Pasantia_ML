@@ -7,14 +7,13 @@ async function initializeApp() {
     }
 
     try {
-        // isAuthenticated = await checkAuth();
+        isAuthenticated = await checkAuth();
 
-        // if (isAuthenticated) {
+        if (isAuthenticated) {
             await AI.init();
             initializeEventListeners();
             updateUIWithUserInfo();
             loadUserApiKeyStatus();
-        }
     } catch (error) {
         console.error('Error al inicializar la aplicación:', error);
         showToast('Error al cargar la aplicación', 'error');
