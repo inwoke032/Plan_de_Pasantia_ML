@@ -7,9 +7,9 @@ async function initializeApp() {
     }
 
     try {
-        isAuthenticated = await checkAuth();
+        // isAuthenticated = await checkAuth();
 
-        if (isAuthenticated) {
+        // if (isAuthenticated) {
             await AI.init();
             initializeEventListeners();
             updateUIWithUserInfo();

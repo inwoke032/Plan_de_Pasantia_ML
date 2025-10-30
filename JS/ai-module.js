@@ -7,7 +7,7 @@
 
 const AI = {
     baseUrl: 'https://generativelanguage.googleapis.com',
-    modelName: 'gemini-2.0-flash-exp',
+    modelName: 'gemini-2.0-flash',
 
     async init() {
         console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
@@ -36,11 +36,12 @@ const AI = {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
             };
             
-            // ✅ NUEVA CORRECCIÓN: Usar 'generationConfig' para 'systemInstruction'.
-            // Esta es la estructura más robusta para el endpoint REST.
+            // ✅ NUEVA CORRECCIÓN: Usar 'systemInstruction' en el nivel superior.
+            // Esta es la estructura correcta para el endpoint REST.
             if (systemInstruction) {
-                bodyPayload.generationConfig = {
-                    systemInstruction: systemInstruction
+                bodyPayload.systemInstruction = {
+                    role: "system",
+                    parts: [{ text: systemInstruction }]
                 };
             }
 
