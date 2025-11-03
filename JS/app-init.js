@@ -14,6 +14,7 @@ async function initializeApp() {
             initializeEventListeners();
             updateUIWithUserInfo();
             loadUserApiKeyStatus();
+        }
     } catch (error) {
         console.error('Error al inicializar la aplicación:', error);
         showToast('Error al cargar la aplicación', 'error');

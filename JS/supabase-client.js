@@ -11,17 +11,42 @@ let userApiKey = null;
 async function checkAuth() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
-    if (!session) {
-        window.location.href = 'auth.html';
-        return false;
+    let user = session ? session.user : null;
+    let isAuthenticated = !!session;
+
+    if (!isAuthenticated) {
+        const storedUser = localStorage.getItem('user');
+        const storedAuth = localStorage.getItem('isAuthenticated');
+        if (storedAuth === 'true' && storedUser) {
+            user = JSON.parse(storedUser);
+            isAuthenticated = true;
+        }
     }
 
-    currentUser = session.user;
-    await loadUserApiKey();
-    return true;
+    if (isAuthenticated && user) {
+        currentUser = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('isAuthenticated', 'true');
+        await loadUserApiKey();
+        return true;
+    }
+
+    if (!window.location.pathname.endsWith('auth.html')) {
+        window.location.href = 'auth.html';
+    }
+    return false;
+}
+
+async function signOut() {
+    await supabaseClient.auth.signOut();
+    localStorage.clear();
+    currentUser = null;
+    userApiKey = null;
+    window.location.href = 'auth.html';
 }
 
 async function loadUserApiKey() {
+    if (!currentUser) return;
     try {
         const { data, error } = await supabaseClient
             .from('user_config')
@@ -38,6 +63,10 @@ async function loadUserApiKey() {
 }
 
 async function saveUserApiKey(apiKey) {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión para guardar una API key', 'error');
+        return;
+    }
     try {
         const { data, error } = await supabaseClient
             .from('user_config')
@@ -57,11 +86,6 @@ async function saveUserApiKey(apiKey) {
         console.error('Error saving API key:', error);
         throw error;
     }
-}
-
-async function signOut() {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'auth.html';
 }
 
 function getUserApiKey() {
