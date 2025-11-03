@@ -2578,28 +2578,6 @@ function showLoading(show) {
     }
 }
 
-// ========================================
-// MODAL MANAGEMENT
-// ========================================
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-}
-
-// Close modal on backdrop click
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        e.target.classList.remove('active');
-    }
-});
-
-// Close modal buttons
-document.querySelectorAll('.modal-close, [data-close-modal]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const modal = btn.closest('.modal');
-        if (modal) modal.classList.remove('active');
-    });
-});
 
 
 // ========================================

@@ -151,8 +151,13 @@ function openModal(modal) {
 }
 
 function closeModal(modal) {
-    if (modal) {
-        modal.classList.remove('active');
+    let modalElement = modal;
+    if (typeof modal === 'string') {
+        modalElement = document.getElementById(modal);
+    }
+
+    if (modalElement) {
+        modalElement.classList.remove('active');
     }
 }
 
