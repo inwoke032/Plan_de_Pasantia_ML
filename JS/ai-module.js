@@ -7,7 +7,7 @@
 
 const AI = {
     baseUrl: 'https://generativelanguage.googleapis.com',
-    modelName: 'gemini-2.0-flash',
+    modelName: 'gemini-2.5-flash',
 
     async init() {
         console.log(`✅ Módulo de IA inicializado con modelo: ${this.modelName}`);
