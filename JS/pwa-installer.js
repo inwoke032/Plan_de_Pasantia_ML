@@ -63,22 +63,57 @@ window.addEventListener('load', () => {
     } else if ('serviceWorker' in navigator) {
         
         // 2.1 REGISTRO Y GESTIÓN DEL SERVICE WORKER
-        // CRÍTICO: Se utiliza el scope del repositorio para GitHub Pages
-        navigator.serviceWorker.register('./service-worker.js', {
-             scope: './'
-        })
+        navigator.serviceWorker.register('./service-worker.js')
             .then((registration) => {
-                console.log('Service Worker registrado exitosamente. Alcance:', registration.scope);
+                console.log('Service Worker registrado exitosamente.');
 
+                // Función para mostrar notificación de actualización
+                const showUpdateNotification = () => {
+                    const notification = document.createElement('div');
+                    notification.id = 'pwa-update-notification';
+                    notification.innerHTML = `
+                        <span>Nueva versión disponible</span>
+                        <button id="pwa-reload-button" class="btn btn-small">Actualizar</button>
+                    `;
+                    notification.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        padding: 12px 20px;
+                        background-color: #333;
+                        color: white;
+                        border-radius: 8px;
+                        z-index: 1001;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    `;
+                    document.body.appendChild(notification);
+
+                    document.getElementById('pwa-reload-button').addEventListener('click', () => {
+                        registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+                    });
+                };
+
+                // Lógica de actualización
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                console.log('Nueva versión de la PWA disponible. Por favor, recargue la página.');
+                                if (registration.waiting) {
+                                    showUpdateNotification();
+                                }
                             }
                         });
                     }
+                });
+
+                // Controlar el cambio de controlador para recargar la página
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
                 });
             })
             .catch((error) => {
