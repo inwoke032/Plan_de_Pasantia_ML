@@ -517,6 +517,41 @@ body {
     margin-bottom: var(--spacing-md);
 }
 
+.pomodoro-settings {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.pomodoro-settings .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pomodoro-settings label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.pomodoro-settings input {
+    width: 60px;
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 .pomodoro-stats {
     text-align: center;
     padding-top: var(--spacing-md);

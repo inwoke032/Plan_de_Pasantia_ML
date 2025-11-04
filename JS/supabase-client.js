@@ -11,17 +11,42 @@ let userApiKey = null;
 async function checkAuth() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
-    if (!session) {
-        window.location.href = 'auth.html';
-        return false;
+    let userIsAuthenticated = false;
+    if (session) {
+        currentUser = session.user;
+        localStorage.setItem('user', JSON.stringify(session.user));
+        localStorage.setItem('isAuthenticated', 'true');
+        userIsAuthenticated = true;
+    } else if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('user')) {
+        currentUser = JSON.parse(localStorage.getItem('user'));
+        userIsAuthenticated = true;
     }
 
-    currentUser = session.user;
-    await loadUserApiKey();
-    return true;
+    if (userIsAuthenticated) {
+        await loadUserApiKey();
+        if (window.location.pathname.endsWith('auth.html')) {
+            window.location.replace('index.html');
+        }
+        return true;
+    }
+
+    if (!window.location.pathname.endsWith('auth.html')) {
+        localStorage.clear();
+        window.location.replace('auth.html');
+    }
+    return false;
+}
+
+async function signOut() {
+    await supabaseClient.auth.signOut();
+    localStorage.clear();
+    currentUser = null;
+    userApiKey = null;
+    window.location.replace('auth.html');
 }
 
 async function loadUserApiKey() {
+    if (!currentUser) return;
     try {
         const { data, error } = await supabaseClient
             .from('user_config')
@@ -38,6 +63,10 @@ async function loadUserApiKey() {
 }
 
 async function saveUserApiKey(apiKey) {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión para guardar una API key', 'error');
+        return;
+    }
     try {
         const { data, error } = await supabaseClient
             .from('user_config')
@@ -59,11 +88,6 @@ async function saveUserApiKey(apiKey) {
     }
 }
 
-async function signOut() {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'auth.html';
-}
-
 function getUserApiKey() {
     return userApiKey;
 }
@@ -73,7 +97,14 @@ function getCurrentUser() {
 }
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
-        window.location.href = 'auth.html';
+    if (event === 'SIGNED_IN') {
+        if (window.location.pathname.endsWith('auth.html')) {
+            window.location.replace('index.html');
+        }
+    } else if (event === 'SIGNED_OUT') {
+        localStorage.clear();
+        currentUser = null;
+        userApiKey = null;
+        window.location.replace('auth.html');
     }
 });

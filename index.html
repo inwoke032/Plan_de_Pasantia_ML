@@ -35,7 +35,6 @@
     <link rel="icon" type="image/png" href="assets/images/logo.png">
 </head>
 <body>
-    <script src="JS/pwa-installer.js"></script>
     <!-- Theme Toggle (Fixed Position) -->
     <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema" data-testid="button-theme-toggle">
         <i class="fas fa-moon"></i>
@@ -176,6 +175,16 @@
                                     <div class="pomodoro-time" id="pomodoroTime" data-testid="text-pomodoro-time">25:00</div>
                                 </div>
                                 <div class="pomodoro-label" id="pomodoroLabel">Sesión de Trabajo</div>
+                            </div>
+                            <div class="pomodoro-settings">
+                                <div class="form-group">
+                                    <label for="pomodoroWorkDuration">Trabajo (min)</label>
+                                    <input type="number" id="pomodoroWorkDuration" value="25" min="1" max="90">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pomodoroBreakDuration">Descanso (min)</label>
+                                    <input type="number" id="pomodoroBreakDuration" value="5" min="1" max="30">
+                                </div>
                             </div>
                             <div class="pomodoro-controls">
                                 <button class="btn btn-primary" id="pomodoroStart" data-testid="button-pomodoro-start">
@@ -1175,6 +1184,10 @@
         </div>
     </div>
 
+    <script>
+        const REPO_NAME = "Plan-de-Pasantia-IA-en-Centro-de-Productividad-Personal";
+    </script>
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1187,13 +1200,13 @@
     <!-- AI Chat -->
     <script src="JS/ai-chat.js"></script>
 
+    <!-- Main JavaScript -->
+    <script src="JS/script.js"></script>
+
     <!-- App Initialization -->
     <script src="JS/app-init.js"></script>
 
     <!-- PWA Installer -->
     <script src="JS/pwa-installer.js"></script>
-
-    <!-- Main JavaScript -->
-    <script src="JS/script.js"></script>
 </body>
 </html>

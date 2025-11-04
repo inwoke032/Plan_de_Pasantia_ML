@@ -527,6 +527,42 @@ function initPomodoro() {
     document.getElementById('pomodoroStart').addEventListener('click', startPomodoro);
     document.getElementById('pomodoroPause').addEventListener('click', pausePomodoro);
     document.getElementById('pomodoroReset').addEventListener('click', resetPomodoro);
+
+    const workDurationInput = document.getElementById('pomodoroWorkDuration');
+    const breakDurationInput = document.getElementById('pomodoroBreakDuration');
+
+    // Load saved durations from localStorage
+    const savedWorkDuration = localStorage.getItem('pomodoroWorkDuration');
+    const savedBreakDuration = localStorage.getItem('pomodoroBreakDuration');
+
+    if (savedWorkDuration) {
+        workDurationInput.value = savedWorkDuration;
+        AppState.pomodoroState.totalTime = savedWorkDuration * 60;
+        AppState.pomodoroState.timeLeft = savedWorkDuration * 60;
+    }
+    if (savedBreakDuration) {
+        breakDurationInput.value = savedBreakDuration;
+    }
+
+    workDurationInput.addEventListener('change', () => {
+        const newDuration = parseInt(workDurationInput.value);
+        localStorage.setItem('pomodoroWorkDuration', newDuration);
+        if (!AppState.pomodoroState.isRunning && !AppState.pomodoroState.isBreak) {
+            AppState.pomodoroState.totalTime = newDuration * 60;
+            AppState.pomodoroState.timeLeft = newDuration * 60;
+            updatePomodoroDisplay();
+        }
+    });
+
+    breakDurationInput.addEventListener('change', () => {
+        const newDuration = parseInt(breakDurationInput.value);
+        localStorage.setItem('pomodoroBreakDuration', newDuration);
+        if (!AppState.pomodoroState.isRunning && AppState.pomodoroState.isBreak) {
+            AppState.pomodoroState.totalTime = newDuration * 60;
+            AppState.pomodoroState.timeLeft = newDuration * 60;
+            updatePomodoroDisplay();
+        }
+    });
     
     updatePomodoroDisplay();
     updatePomodoroSessionsToday();
@@ -566,7 +602,11 @@ function resetPomodoro() {
     clearInterval(pomodoroInterval);
     AppState.pomodoroState.isRunning = false;
     AppState.pomodoroState.isPaused = false;
-    AppState.pomodoroState.timeLeft = AppState.pomodoroState.isBreak ? 5 * 60 : 25 * 60;
+
+    const workDuration = parseInt(document.getElementById('pomodoroWorkDuration').value) || 25;
+    const breakDuration = parseInt(document.getElementById('pomodoroBreakDuration').value) || 5;
+
+    AppState.pomodoroState.timeLeft = AppState.pomodoroState.isBreak ? breakDuration * 60 : workDuration * 60;
     AppState.pomodoroState.totalTime = AppState.pomodoroState.timeLeft;
     
     document.getElementById('pomodoroStart').disabled = false;
@@ -589,17 +629,19 @@ function completePomodoro() {
         
         showToast('¡Sesión completada! Toma un descanso', 'success');
         
+        const breakDuration = parseInt(document.getElementById('pomodoroBreakDuration').value) || 5;
         // Start break
         AppState.pomodoroState.isBreak = true;
-        AppState.pomodoroState.timeLeft = 5 * 60; // 5 minute break
-        AppState.pomodoroState.totalTime = 5 * 60;
+        AppState.pomodoroState.timeLeft = breakDuration * 60;
+        AppState.pomodoroState.totalTime = breakDuration * 60;
     } else {
         // Completed break
         showToast('¡Descanso terminado! Vuelve a trabajar', 'info');
         
+        const workDuration = parseInt(document.getElementById('pomodoroWorkDuration').value) || 25;
         AppState.pomodoroState.isBreak = false;
-        AppState.pomodoroState.timeLeft = 25 * 60;
-        AppState.pomodoroState.totalTime = 25 * 60;
+        AppState.pomodoroState.timeLeft = workDuration * 60;
+        AppState.pomodoroState.totalTime = workDuration * 60;
     }
     
     AppState.pomodoroState.isRunning = false;
@@ -1304,40 +1346,40 @@ function renderMonthView() {
     document.getElementById('calendarMonthView').style.display = 'block';
     document.getElementById('calendarWeekView').style.display = 'none';
     document.getElementById('calendarDayView').style.display = 'none';
-    
+
     const year = AppState.calendarDate.getFullYear();
     const month = AppState.calendarDate.getMonth();
-    
-    document.getElementById('calendarTitle').textContent = 
+
+    document.getElementById('calendarTitle').textContent =
         new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-    
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-    
+
     // Previous month days
     for (let i = 0; i < firstDay; i++) {
         grid.appendChild(document.createElement('div'));
     }
-    
+
     // Current month days with interactive calendar
     const today = new Date();
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(year, month, day);
         const dayEl = document.createElement('div');
-        
+
         if (currentDate >= START_DATE && currentDate <= END_DATE) {
             dayEl.className = 'calendar-day';
             dayEl.textContent = day;
             dayEl.dataset.date = currentDate.toISOString().split('T')[0];
-            
+
             // Check if it's today
             if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                 dayEl.classList.add('today');
             }
-            
+
             // Make clickable to show daily schedule
             dayEl.addEventListener('click', (e) => {
                 AppState.selectedDate = new Date(`${e.target.dataset.date}T00:00:00`);
@@ -1348,10 +1390,10 @@ function renderMonthView() {
             dayEl.className = 'calendar-day other-month';
             dayEl.textContent = day;
         }
-        
+
         grid.appendChild(dayEl);
     }
-    
+
     // Next month days
     const remainingDays = 42 - (firstDay + daysInMonth);
     for (let day = 1; day <= remainingDays; day++) {
@@ -2044,10 +2086,6 @@ async function initAI() {
     const aiChatSend = document.getElementById('aiChatSend');
     const aiChatInput = document.getElementById('aiChatInputField');
     
-    aiChatToggle.addEventListener('click', () => {
-        aiChatPanel.classList.toggle('active');
-    });
-    
     aiChatClose.addEventListener('click', () => {
         aiChatPanel.classList.remove('active');
     });
@@ -2582,35 +2620,14 @@ function showLoading(show) {
     }
 }
 
-// ========================================
-// MODAL MANAGEMENT
-// ========================================
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-}
-
-// Close modal on backdrop click
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        e.target.classList.remove('active');
-    }
-});
-
-// Close modal buttons
-document.querySelectorAll('.modal-close, [data-close-modal]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const modal = btn.closest('.modal');
-        if (modal) modal.classList.remove('active');
-    });
-});
 
 
 // ========================================
 // INITIALIZATION
 // ========================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initializeApp() {
+    console.log('🚀 Initializing application...');
     initNavigation();
     initTheme();
     initPomodoro();
@@ -2621,7 +2638,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     initResources();
     initGoals();
     initExport();
+
+    // Re-add modal and settings listeners
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').classList.add('active');
+        const user = getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userCreatedAt').textContent = new Date(user.created_at).toLocaleDateString();
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            await signOut();
+        }
+    });
+
+    document.getElementById('saveApiKeyBtn').addEventListener('click', async () => {
+        const apiKey = document.getElementById('geminiApiKey').value;
+        if (!apiKey) {
+            showToast('Por favor, introduce una API key', 'error');
+            return;
+        }
+        try {
+            await saveUserApiKey(apiKey);
+            await AI.init(); // Re-initialize AI with the new key
+            showToast('API key guardada correctamente', 'success');
+            document.getElementById('settingsModal').classList.remove('active');
+        } catch (error) {
+            showToast('Error al guardar la API key', 'error');
+        }
+    });
     
+    document.querySelectorAll('.modal-close, [data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.modal').classList.remove('active');
+        });
+    });
+
     await initAI();
     initQuickCapture();
     initGlobalSearch();
@@ -2647,4 +2702,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🤖 Funcionalidades de IA:', AI.apiKey ? 'Activadas' : 'Desactivadas (verifica GEMINI_API_KEY)');
     console.log('⌨️  Atajos: Ctrl+K (Buscar), Ctrl+Shift+N (Captura Rápida), Ctrl+1-3 (Navegación)');
     showToast('¡Bienvenido a tu Centro de Productividad Mejorado con IA!', 'success');
-});
+}

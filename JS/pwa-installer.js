@@ -2,7 +2,7 @@ let deferredPrompt;
 // Crea y configura el botón de instalación
 const installButton = document.createElement('button');
 installButton.id = 'pwa-install-button';
-installButton.className = 'pwa-install-btn btn btn-primary'; 
+installButton.className = 'pwa-install-btn btn btn-primary';
 installButton.innerHTML = '<i class="fas fa-download"></i> Instalar App';
 installButton.style.display = 'none'; // Ocultar por defecto
 
@@ -41,13 +41,13 @@ window.addEventListener('load', () => {
             </p>
         `;
         iosInstallMessage.style.cssText = `
-            position: fixed; 
-            bottom: 20px; 
-            width: 90%; 
-            padding: 15px; 
-            background: #4A90E2; 
-            color: white; 
-            text-align: center; 
+            position: fixed;
+            bottom: 20px;
+            width: 90%;
+            padding: 15px;
+            background: #4A90E2;
+            color: white;
+            text-align: center;
             border-radius: 8px;
             left: 50%;
             transform: translateX(-50%);
@@ -65,7 +65,7 @@ window.addEventListener('load', () => {
         // 2.1 REGISTRO Y GESTIÓN DEL SERVICE WORKER
         // CRÍTICO: Se utiliza el scope del repositorio para GitHub Pages
         navigator.serviceWorker.register('./service-worker.js', {
-             scope: `/${REPO_NAME}/` 
+             scope: './'
         })
             .then((registration) => {
                 console.log('Service Worker registrado exitosamente. Alcance:', registration.scope);
@@ -89,7 +89,7 @@ window.addEventListener('load', () => {
 
         // Captura el evento beforeinstallprompt (solo en navegadores compatibles)
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
             deferredPrompt = e;
 
             if (!isInstalled()) { 
