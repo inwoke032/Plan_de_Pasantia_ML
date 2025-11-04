@@ -11,28 +11,28 @@ let userApiKey = null;
 async function checkAuth() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
-    let user = session ? session.user : null;
-    let isAuthenticated = !!session;
-
-    if (!isAuthenticated) {
-        const storedUser = localStorage.getItem('user');
-        const storedAuth = localStorage.getItem('isAuthenticated');
-        if (storedAuth === 'true' && storedUser) {
-            user = JSON.parse(storedUser);
-            isAuthenticated = true;
-        }
+    let userIsAuthenticated = false;
+    if (session) {
+        currentUser = session.user;
+        localStorage.setItem('user', JSON.stringify(session.user));
+        localStorage.setItem('isAuthenticated', 'true');
+        userIsAuthenticated = true;
+    } else if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('user')) {
+        currentUser = JSON.parse(localStorage.getItem('user'));
+        userIsAuthenticated = true;
     }
 
-    if (isAuthenticated && user) {
-        currentUser = user;
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('isAuthenticated', 'true');
+    if (userIsAuthenticated) {
         await loadUserApiKey();
+        if (window.location.pathname.endsWith('auth.html')) {
+            window.location.replace('index.html');
+        }
         return true;
     }
 
     if (!window.location.pathname.endsWith('auth.html')) {
-        window.location.href = 'auth.html';
+        localStorage.clear();
+        window.location.replace('auth.html');
     }
     return false;
 }
@@ -42,7 +42,7 @@ async function signOut() {
     localStorage.clear();
     currentUser = null;
     userApiKey = null;
-    window.location.href = 'auth.html';
+    window.location.replace('auth.html');
 }
 
 async function loadUserApiKey() {
@@ -97,7 +97,14 @@ function getCurrentUser() {
 }
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
-        window.location.href = 'auth.html';
+    if (event === 'SIGNED_IN') {
+        if (window.location.pathname.endsWith('auth.html')) {
+            window.location.replace('index.html');
+        }
+    } else if (event === 'SIGNED_OUT') {
+        localStorage.clear();
+        currentUser = null;
+        userApiKey = null;
+        window.location.replace('auth.html');
     }
 });

@@ -2584,7 +2584,8 @@ function showLoading(show) {
 // INITIALIZATION
 // ========================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initializeApp() {
+    console.log('🚀 Initializing application...');
     initNavigation();
     initTheme();
     initPomodoro();
@@ -2595,7 +2596,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     initResources();
     initGoals();
     initExport();
+
+    // Re-add modal and settings listeners
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').classList.add('active');
+        const user = getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userCreatedAt').textContent = new Date(user.created_at).toLocaleDateString();
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            await signOut();
+        }
+    });
+
+    document.getElementById('saveApiKeyBtn').addEventListener('click', async () => {
+        const apiKey = document.getElementById('geminiApiKey').value;
+        if (!apiKey) {
+            showToast('Por favor, introduce una API key', 'error');
+            return;
+        }
+        try {
+            await saveUserApiKey(apiKey);
+            await AI.init(); // Re-initialize AI with the new key
+            showToast('API key guardada correctamente', 'success');
+            document.getElementById('settingsModal').classList.remove('active');
+        } catch (error) {
+            showToast('Error al guardar la API key', 'error');
+        }
+    });
     
+    document.querySelectorAll('.modal-close, [data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.modal').classList.remove('active');
+        });
+    });
+
     await initAI();
     initQuickCapture();
     initGlobalSearch();
@@ -2621,4 +2660,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🤖 Funcionalidades de IA:', AI.apiKey ? 'Activadas' : 'Desactivadas (verifica GEMINI_API_KEY)');
     console.log('⌨️  Atajos: Ctrl+K (Buscar), Ctrl+Shift+N (Captura Rápida), Ctrl+1-3 (Navegación)');
     showToast('¡Bienvenido a tu Centro de Productividad Mejorado con IA!', 'success');
-});
+}

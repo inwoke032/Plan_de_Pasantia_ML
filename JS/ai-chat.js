@@ -53,10 +53,10 @@ async function sendChatMessage() {
 
     if (!message) return;
 
-    // if (!getUserApiKey()) {
-    //     showToast('Por favor configura tu API Key de Gemini en Configuración', 'error');
-    //     return;
-    // }
+    if (!getUserApiKey()) {
+        showToast('Por favor configura tu API Key de Gemini en Configuración', 'error');
+        return;
+    }
 
     addMessageToChat('user', message);
     aiChatInputField.value = '';
