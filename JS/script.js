@@ -527,6 +527,42 @@ function initPomodoro() {
     document.getElementById('pomodoroStart').addEventListener('click', startPomodoro);
     document.getElementById('pomodoroPause').addEventListener('click', pausePomodoro);
     document.getElementById('pomodoroReset').addEventListener('click', resetPomodoro);
+
+    const workDurationInput = document.getElementById('pomodoroWorkDuration');
+    const breakDurationInput = document.getElementById('pomodoroBreakDuration');
+
+    // Load saved durations from localStorage
+    const savedWorkDuration = localStorage.getItem('pomodoroWorkDuration');
+    const savedBreakDuration = localStorage.getItem('pomodoroBreakDuration');
+
+    if (savedWorkDuration) {
+        workDurationInput.value = savedWorkDuration;
+        AppState.pomodoroState.totalTime = savedWorkDuration * 60;
+        AppState.pomodoroState.timeLeft = savedWorkDuration * 60;
+    }
+    if (savedBreakDuration) {
+        breakDurationInput.value = savedBreakDuration;
+    }
+
+    workDurationInput.addEventListener('change', () => {
+        const newDuration = parseInt(workDurationInput.value);
+        localStorage.setItem('pomodoroWorkDuration', newDuration);
+        if (!AppState.pomodoroState.isRunning && !AppState.pomodoroState.isBreak) {
+            AppState.pomodoroState.totalTime = newDuration * 60;
+            AppState.pomodoroState.timeLeft = newDuration * 60;
+            updatePomodoroDisplay();
+        }
+    });
+
+    breakDurationInput.addEventListener('change', () => {
+        const newDuration = parseInt(breakDurationInput.value);
+        localStorage.setItem('pomodoroBreakDuration', newDuration);
+        if (!AppState.pomodoroState.isRunning && AppState.pomodoroState.isBreak) {
+            AppState.pomodoroState.totalTime = newDuration * 60;
+            AppState.pomodoroState.timeLeft = newDuration * 60;
+            updatePomodoroDisplay();
+        }
+    });
     
     updatePomodoroDisplay();
     updatePomodoroSessionsToday();
@@ -566,7 +602,11 @@ function resetPomodoro() {
     clearInterval(pomodoroInterval);
     AppState.pomodoroState.isRunning = false;
     AppState.pomodoroState.isPaused = false;
-    AppState.pomodoroState.timeLeft = AppState.pomodoroState.isBreak ? 5 * 60 : 25 * 60;
+
+    const workDuration = parseInt(document.getElementById('pomodoroWorkDuration').value) || 25;
+    const breakDuration = parseInt(document.getElementById('pomodoroBreakDuration').value) || 5;
+
+    AppState.pomodoroState.timeLeft = AppState.pomodoroState.isBreak ? breakDuration * 60 : workDuration * 60;
     AppState.pomodoroState.totalTime = AppState.pomodoroState.timeLeft;
     
     document.getElementById('pomodoroStart').disabled = false;
@@ -589,17 +629,19 @@ function completePomodoro() {
         
         showToast('¡Sesión completada! Toma un descanso', 'success');
         
+        const breakDuration = parseInt(document.getElementById('pomodoroBreakDuration').value) || 5;
         // Start break
         AppState.pomodoroState.isBreak = true;
-        AppState.pomodoroState.timeLeft = 5 * 60; // 5 minute break
-        AppState.pomodoroState.totalTime = 5 * 60;
+        AppState.pomodoroState.timeLeft = breakDuration * 60;
+        AppState.pomodoroState.totalTime = breakDuration * 60;
     } else {
         // Completed break
         showToast('¡Descanso terminado! Vuelve a trabajar', 'info');
         
+        const workDuration = parseInt(document.getElementById('pomodoroWorkDuration').value) || 25;
         AppState.pomodoroState.isBreak = false;
-        AppState.pomodoroState.timeLeft = 25 * 60;
-        AppState.pomodoroState.totalTime = 25 * 60;
+        AppState.pomodoroState.timeLeft = workDuration * 60;
+        AppState.pomodoroState.totalTime = workDuration * 60;
     }
     
     AppState.pomodoroState.isRunning = false;
