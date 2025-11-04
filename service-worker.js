@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pasantia-ia-v1';
+const CACHE_NAME = 'pasantia-ia-v2';
 const urlsToCache = [
   'index.html',
   'auth.html',
